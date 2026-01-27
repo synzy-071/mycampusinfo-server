@@ -9,7 +9,21 @@ const InfrastructureSchema = new mongoose.Schema({
   },
   labs: {
     type: [String],
-    enum: ['Physics', 'Chemistry', 'Biology', 'Computer', 'Robotics', 'Language']
+    enum: [
+      "Computer Lab",
+      "Science Lab",
+      "Research Lab",
+      "Language Lab",
+      "Innovation Lab",
+      "Skill Development Lab",
+      "Simulation Lab",
+      "Digital Lab",
+      "Analytics Lab",
+      "Practical Training Lab",
+      "Workshop",
+      "Multimedia Lab"
+    ]
+
   },
   sportsGrounds: {
     type: [String],

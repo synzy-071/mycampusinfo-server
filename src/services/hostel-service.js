@@ -1,17 +1,42 @@
-import Hostel from "../models/school_details/hostel_model.js";
+import Hostel from "../models/school_details/hostel-model.js";
+import mongoose from "mongoose";
 
-export const createHostelService = async (data) => {
-  return await Hostel.create(data);
+/**
+ * Get all hostels by collegeId
+ */
+export const getHostelsByCollegeIdService = async (collegeId) => {
+  return await Hostel.find({
+    collegeId: new mongoose.Types.ObjectId(collegeId),
+    isActive: true,
+  }).sort({ createdAt: -1 });
 };
 
-export const getHostelByCollegeIdService = async (collegeId) => {
-  return await Hostel.find({ collegeId }); // multiple hostels possible
+/**
+ * Add hostel
+ */
+export const addHostelService = async (data) => {
+  const hostel = new Hostel(data);
+  return await hostel.save();
 };
 
-export const updateHostelService = async (id, data) => {
-  return await Hostel.findByIdAndUpdate(id, data, { new: true });
+/**
+ * Update hostel
+ */
+export const updateHostelService = async (hostelId, data) => {
+  return await Hostel.findByIdAndUpdate(
+    hostelId,
+    data,
+    { new: true }
+  );
 };
 
-export const deleteHostelService = async (id) => {
-  return await Hostel.findByIdAndDelete(id);
+/**
+ * Delete hostel (soft delete)
+ */
+export const deleteHostelService = async (hostelId) => {
+  return await Hostel.findByIdAndUpdate(
+    hostelId,
+    { isActive: false },
+    { new: true }
+  );
 };

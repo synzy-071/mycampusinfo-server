@@ -9,7 +9,7 @@ export const searchCollegesService = async ({ search, streams, cities, state, co
   const feeArray = feeRange ? (Array.isArray(feeRange) ? feeRange : feeRange.split(",")) : [];
 
   const validStreams = [
-    'engineering', 'management', 'arts', 'science', 'law', 'medical', 'design', 'humanities',
+    'Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities',
   ];
 
   const invalidStreams = streamArrays.filter(s => !validStreams.includes(s));

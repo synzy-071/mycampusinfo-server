@@ -10,7 +10,7 @@ const CollegeSchema = new mongoose.Schema({
     city: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String, required: true },
-    ranking: { type: Number, required: true },
+    ranking: { type: String },
     estYear: { type: String, required: true },
     lat: { type: Number, required: true },
     long: { type: Number, required: true },
@@ -42,7 +42,7 @@ const CollegeSchema = new mongoose.Schema({
     stream: {
         type: String,
         required: true,
-        enum: ['engineering', 'management', 'arts', 'science', 'law', 'medical', 'design', 'humanities'] // ✅ Added "Management"
+        enum: ['Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities'] 
     },
     email: { type: String, required: true },
     mobileNo: { type: String, required: true },

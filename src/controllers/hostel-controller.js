@@ -1,44 +1,93 @@
 import {
-  createHostelService,
-  getHostelByCollegeIdService,
+  getHostelsByCollegeIdService,
+  addHostelService,
   updateHostelService,
   deleteHostelService,
 } from "../services/hostel-service.js";
+import mongoose from "mongoose";
 
+/**
+ * GET /api/hostels/college/:collegeId
+ */
+export const getHostelsByCollegeId = async (req, res) => {
+    console.log("RAW PARAMS =>", req.params);
+  console.log("collegeId =>", req.params.collegeId);
+  console.log("isValidObjectId =>", mongoose.Types.ObjectId.isValid(req.params.collegeId));
+  try {
+    const { collegeId } = req.params;
+
+    const hostels =
+      await getHostelsByCollegeIdService(collegeId);
+
+    return res.status(200).json({
+      success: true,
+      data: hostels,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/hostels
+ */
 export const addHostel = async (req, res) => {
   try {
-    const data = await createHostelService(req.body);
-    res.status(201).json({ success: true, message: "Hostel added", data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    const hostel = await addHostelService(req.body);
+
+    return res.status(201).json({
+      success: true,
+      data: hostel,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const getHostelsByCollegeId = async (req, res) => {
-  try {
-    const data = await getHostelByCollegeIdService(req.params.collegeId);
-    res.json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
+/**
+ * PUT /api/hostels/:id
+ */
 export const updateHostel = async (req, res) => {
   try {
-    const data = await updateHostelService(req.params.id, req.body);
-    if (!data) return res.status(404).json({ success: false, message: "Not found" });
-    res.json({ success: true, message: "Hostel updated", data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    const hostel = await updateHostelService(
+      req.params.id,
+      req.body
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: hostel,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+/**
+ * DELETE /api/hostels/:id
+ */
 export const deleteHostel = async (req, res) => {
   try {
-    const data = await deleteHostelService(req.params.id);
-    if (!data) return res.status(404).json({ success: false, message: "Not found" });
-    res.json({ success: true, message: "Hostel deleted" });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    const hostel =
+      await deleteHostelService(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      data: hostel,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

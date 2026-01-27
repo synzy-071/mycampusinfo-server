@@ -22,7 +22,9 @@ const ActivitiesSchema = new mongoose.Schema({
       'STEM Activities',
       'Cultural Education',
       'Technology Integration',
-      'Environmental Awareness'
+      'Environmental Awareness',
+      'Startup Incubation',
+      'Robotics Club'
     ]
   }]
 }, { timestamps: true });

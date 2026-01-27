@@ -3,91 +3,72 @@ import mongoose from 'mongoose';
 const StudentApplicationSchema = new mongoose.Schema({
 
   studId: { type: mongoose.Schema.Types.ObjectId, ref: 'students', required: true },
+
   name: { type: String, required: true },
   location: { type: String, required: true },
   dob: { type: Date, required: true },
-  age: { type: Number },
   gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
   motherTongue: { type: String, required: true },
-  placeOfBirth: { type: String, default: null }, 
-  speciallyAbled: { type: Boolean, default: false }, 
-  speciallyAbledType: {
-  type: String,
-  default: null
-  },
+  placeOfBirth: { type: String, default: null },
+  speciallyAbled: { type: Boolean, default: false },
   nationality: { type: String, required: true },
-  religion: { type: String, required: true },
-  caste: { type: String, required: true },
-  subcaste: { type: String, default: null },
-  aadharNo: { type: String, required: true },
-  bloodGroup: { type: String, required: true },
-  allergicTo: { type: String, default: null },
-  interest: { type: String, required: true },
+category :{type:String,required :true},
+  // Parent Details
+  fatherName: { type: String, required: false },
+  fatherAge: { type: Number, required: false },
+  fatherQualification: { type: String, required: false },
+  fatherProfession: { type: String, required: false },
+  fatherAnnualIncome: { type: String, required: false },
+  fatherPhoneNo: { type: String, required:  false },
+  fatherEmail: { type: String, required: false },
 
-  // Last school/play school [if attended]
-  lastSchoolName: { type: String, default: null },
-  classCompleted: { type: String, default: null }, 
-  lastAcademicYear: { type: String, default: null },
-  reasonForLeaving: { type: String, default: null },
-  board: { type: String, default: null },
+  motherName: { type: String, required: false },
+  motherAge: { type: Number, required: false },
+  motherQualification: { type: String, required: false },
+  motherProfession: { type: String, required: false },
+  motherAnnualIncome: { type: String, required: false },
+  motherPhoneNo: { type: String, required: false },
+  motherEmail: { type: String, required: false },
 
-  // Father Details
-  fatherName: { type: String, required: true },
-  fatherAge: { type: Number, required: true },
-  fatherQualification: { type: String, required: true },
-  fatherProfession: { type: String, required: true },
-  fatherAnnualIncome: { type: String, required: true },
-  fatherPhoneNo: { type: String, required: true },
-  fatherAadharNo: { type: String, required: true },
-  fatherEmail: { type: String, required: true },
+  yearlyBudget: { type: String, required: false },
 
-  // Mother Details
-  motherName: { type: String, required: true },
-  motherAge: { type: Number, required: true },
-  motherQualification: { type: String, required: true },
-  motherProfession: { type: String, required: true },
-  motherAnnualIncome: { type: String, required: true },
-  motherPhoneNo: { type: String, required: true },
-  motherAadharNo: { type: String, required: true },
-  motherEmail: { type: String, required: true },
+  // 🎓 Course Preferences (STRING only)
+  coursePreferences: [
+    {
+      priority: { type: Number, enum: [1, 2, 3], required: true },
+      courseName: { type: String, required: true }
+    }
+  ],
 
-  relationshipStatus: { type: String, enum: ['Married', 'Divorced', 'Single Mother', 'Single Father', 'Widowed', 'Other'],   required: true},
+  // 🎓 Latest Qualification
+  latestQualification: {
+    level: {
+      type: String,
+      enum: ['10th', '12th', 'Diploma', 'UG', 'PG'],
+      required: true
+    },
 
-  // if divorced
-  guardianName: { type: String, default: null }, 
-  guardianContactNo: { type: String, default: null },
-  guardianRelationToStudent: { type: String, default: null },
-  guardianQualification: { type: String, default: null},
-  guardianProfession: { type: String,default: null },
-  guardianEmail: { type: String, default: null },
-  guardianAadharNo: { type: String,  default: null },
+  },
 
-  presentAddress: { type: String, required: true },
-  permanentAddress: { type: String, required: true },
-
-  // Sibling Info (Array of objects)
-  siblings: [{
-    name: String,
-    age: Number,
-    sex: String,
-    nameOfInstitute: String,
-    className: String
-  }],
-
-  homeLanguage: { type: String,  required: true },
-  yearlyBudget:  { type: String,  required: true }
-
-  // photo: { type: String, required: true },
-  // dobCertificate: { type: String, required: true },
-  // casteCertificate: { type: String, required: true }, // Certificate if from reserverd category
-  // reportCard: { type: String, required: true },
-  // transferCertificate: { type: String, required: true },
-  // migrationCertificate: { type: String, required: true },
-
-  // fatherPhoto: { type: String, required: true }, 
-  // motherPhoto: { type: String, required: true },
+  // 📚 Academic Details
+  academicDetails: {
+    stream: {
+      type: String,
+      enum: ['PCM', 'PCB', 'PCMB', 'Arts', 'Commerce', 'Other'],
+      required: true
+    },
+    subjects: [
+      {
+        subjectName: { type: String, required: true },
+        marksObtained: { type: Number, required: true },
+        maxMarks: { type: Number, required: true }
+      }
+    ],
+    overallPercentage: { type: Number }
+  }
 
 }, { timestamps: true });
+
 
 StudentApplicationSchema.pre('save', function (next) {
   if (this.dob) {
