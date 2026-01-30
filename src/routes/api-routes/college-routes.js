@@ -298,5 +298,7 @@ router.put("/admission/:collegeId", updateAdmissionTimeline);
 router.delete("/admission/:collegeId", deleteAdmissionTimeline);
 
 /*===================== FEATURES =============== */
+router.post("/predict-colleges", predictColleges);
+
 
 export default router;

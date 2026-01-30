@@ -6,6 +6,7 @@ const PreferenceSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "authId",
             required: true
+
         },
         state: {
             type: String,
@@ -20,7 +21,7 @@ const PreferenceSchema = new mongoose.Schema(
         preferredStream: {
             type: String,
             required: true,
-            enum: ['engineering', 'management', 'arts', 'science', 'law', 'medical', 'design', 'humanities']
+            enum: ['Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities']
         },
         interests: {
             type: String,
@@ -37,7 +38,9 @@ const PreferenceSchema = new mongoose.Schema(
                 'STEM Activities',
                 'Cultural Education',
                 'Technology Integration',
-                'Environmental Awareness'
+                'Environmental Awareness',
+                  'Startup Incubation',
+                      'Robotics Club'
             ],
         },
         collegeType: {
