@@ -2,7 +2,7 @@ import {
   createCollegeService,
   getAllCollegesService,
   getCollegeByIdService,
-  updateCollegeByAuthIdService,
+ updateCollegeByIdService,
   deleteCollegeByAuthIdService,
 } from "../services/college-service.js";
 
@@ -52,15 +52,22 @@ export const getCollegeById = async (req, res) => {
 
 
 /* UPDATE BY AUTH ID */
-export const updateCollegeByAuthId = async (req, res) => {
+export const updateCollegeById = async (req, res) => {
   try {
-    const updated = await updateCollegeByAuthIdService(req.params.authId, req.body);
-    if (!updated) return res.status(404).json({ success: false, message: "College not found" });
+    const updated = await updateCollegeByIdService(
+      req.params.collegeId,
+      req.body
+    );
+
+    if (!updated)
+      return res.status(404).json({ success: false, message: "College not found" });
+
     res.json({ success: true, message: "College updated", data: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 
 

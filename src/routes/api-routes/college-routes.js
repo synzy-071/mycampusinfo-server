@@ -26,8 +26,7 @@ import {
     getColleges,
 
     getCollegeById,
-    updateCollegeByAuthId,
-
+  updateCollegeById,
     deleteCollegeByAuthId,
 } from "../../controllers/college-controller.js";
 
@@ -172,7 +171,7 @@ router.post("/add", addCollege);
 router.get("/", getColleges);
 router.get("/:collegeId", getCollegeById);
 
-router.put("/:collegeId", updateCollegeByAuthId);
+router.put("/:collegeId", updateCollegeById);
 
 router.delete("/:collegeId", deleteCollegeByAuthId);
 
