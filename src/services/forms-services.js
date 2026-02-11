@@ -75,6 +75,7 @@ export const getFormsBySchoolService = async (collegeId, status) => {
 
   for (const form of forms) {
     const admissionTimeline = await AdmissionTimeline.findOne({ collegeId: form.collegeId, 'timelines._id': form.timelineId });
+    if(!admissionTimeline) continue; // skip if no admission timeline found for this college
     const timelines = admissionTimeline.timelines;
     const timeline = timelines.find(t => t._id.toString() === form.timelineId.toString());
     const populatedForm = await form.populate({
