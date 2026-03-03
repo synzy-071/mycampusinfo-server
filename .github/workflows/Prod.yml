@@ -1,26 +1,24 @@
-name: Deploy synzy-clg-Backend to VPS
+name: Deploy Prod
 
 on:
   push:
     branches:
-      - stage
+      - prod
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - name: Deploy to Hostinger VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /var/www/synzy-clg-test/mycampusinfo-server
-
-            git pull origin stage
-
-            npm install
-
-            pm2 reload synzy-clg-test || pm2 start server.js --name synzy-clg-test
+            cd synzy/mycampusinfo-server
+            git pull origin prod
+            npm i
+            pm2 reload college-api
+            pm2 save
