@@ -18,6 +18,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd synzy/mycampusinfo-server
+            git checkout prod
             git pull origin prod
             npm i
             pm2 reload college-api
