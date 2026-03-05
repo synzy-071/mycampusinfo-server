@@ -74,8 +74,8 @@ export const getCollegeByIdService = async (collegeId) => {
 
 
 /* UPDATE BY AUTH ID */
-export const updateCollegeByAuthIdService = async (authId, data) => {
-  return await College.findOneAndUpdate({ authId }, data, { new: true });
+export const updateCollegeByIdService = (collegeId, data) => {
+  return College.findByIdAndUpdate(collegeId, data, { new: true });
 };
 
 
