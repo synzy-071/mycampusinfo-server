@@ -7,7 +7,7 @@ const CourseFeeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true,
-      unique: true, // one fee structure per course
+      unique: true, 
     },
 
     tuition: { type: Number, required: true, min: 0 },

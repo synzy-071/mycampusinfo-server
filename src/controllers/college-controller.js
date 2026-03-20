@@ -4,6 +4,10 @@ import {
   getCollegeByIdService,
  updateCollegeByIdService,
   deleteCollegeByAuthIdService,
+    uploadCollegePhotosService,
+  uploadCollegeLogoService,
+  uploadCollegeVideoService,
+  deleteCollegePhotoService,
 } from "../services/college-service.js";
 
 /* ADD */
@@ -79,5 +83,50 @@ export const deleteCollegeByAuthId = async (req, res) => {
     res.json({ success: true, message: "College deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const uploadCollegePhotos = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0)
+      return res.status(400).json({ success: false, message: "No files uploaded" });
+
+    const college = await uploadCollegePhotosService(req.params.collegeId, req.files);
+    res.json({ success: true, message: "Photos uploaded", data: college });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ success: false, message: err.message });
+  }
+};
+
+export const uploadCollegeLogo = async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+
+    const college = await uploadCollegeLogoService(req.params.collegeId, req.file);
+    res.json({ success: true, message: "Logo uploaded", data: college });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ success: false, message: err.message });
+  }
+};
+
+export const uploadCollegeVideo = async (req, res) => {
+  try {
+    if (!req.file)
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+
+    const college = await uploadCollegeVideoService(req.params.collegeId, req.file);
+    res.json({ success: true, message: "Video uploaded", data: college });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteCollegePhoto = async (req, res) => {
+  try {
+    const college = await deleteCollegePhotoService(req.params.collegeId, req.params.publicId);
+    res.json({ success: true, message: "Photo deleted", data: college });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ success: false, message: err.message });
   }
 };

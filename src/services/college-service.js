@@ -5,6 +5,8 @@ import CourseExam from "../models/school_details/exam-model.js"
 
 import CoursePlacement from "../models/school_details/placement_model.js"
 import mongoose from "mongoose";
+import cloudinary from "../../config/cloudinary.js";
+import streamifier from "streamifier";
 /* ADD COLLEGE */
 export const createCollegeService = async (data) => {
   const {
@@ -82,4 +84,86 @@ export const updateCollegeByIdService = (collegeId, data) => {
 /* DELETE BY AUTH ID */
 export const deleteCollegeByAuthIdService = async (authId) => {
   return await College.findOneAndDelete({ authId });
+};
+
+/* UPLOAD PHOTOS */
+export const uploadCollegePhotosService = async (collegeId, files) => {
+  const college = await College.findById(collegeId);
+  if (!college) throw Object.assign(new Error("College not found"), { statusCode: 404 });
+
+  const uploadPromises = files.map(file => new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "colleges/photos", resource_type: "image" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve({ url: result.secure_url, publicId: result.public_id });
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  }));
+
+  const uploadedPhotos = await Promise.all(uploadPromises);
+  college.photos.push(...uploadedPhotos);
+  await college.save();
+  return college;
+};
+
+/* UPLOAD LOGO */
+export const uploadCollegeLogoService = async (collegeId, file) => {
+  const college = await College.findById(collegeId);
+  if (!college) throw Object.assign(new Error("College not found"), { statusCode: 404 });
+
+  // Delete old logo from cloudinary if exists
+  if (college.logo?.publicId) {
+    await cloudinary.uploader.destroy(college.logo.publicId);
+  }
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "colleges/logos", resource_type: "image" },
+      async (error, result) => {
+        if (error) return reject(error);
+        college.logo = { url: result.secure_url, publicId: result.public_id };
+        await college.save();
+        resolve(college);
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+};
+
+/* UPLOAD VIDEO */
+export const uploadCollegeVideoService = async (collegeId, file) => {
+  const college = await College.findById(collegeId);
+  if (!college) throw Object.assign(new Error("College not found"), { statusCode: 404 });
+
+  // Delete old video from cloudinary if exists
+  if (college.videos?.publicId) {
+    await cloudinary.uploader.destroy(college.videos.publicId, { resource_type: "video" });
+  }
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "colleges/videos", resource_type: "video" },
+      async (error, result) => {
+        if (error) return reject(error);
+        college.videos = { url: result.secure_url, publicId: result.public_id };
+        await college.save();
+        resolve(college);
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+};
+
+/* DELETE PHOTO */
+export const deleteCollegePhotoService = async (collegeId, publicId) => {
+  await cloudinary.uploader.destroy(publicId);
+  const college = await College.findByIdAndUpdate(
+    collegeId,
+    { $pull: { photos: { publicId } } },
+    { new: true }
+  );
+  if (!college) throw Object.assign(new Error("College not found"), { statusCode: 404 });
+  return college;
 };
