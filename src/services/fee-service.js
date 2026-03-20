@@ -5,20 +5,31 @@ import mongoose from "mongoose";
 /**
  * 🔹 Add / Update Course Fee (course-based)
  */
-export const upsertCourseFeeService = async (data) => {
-  const { courseId } = data;
-
-  if (!mongoose.Types.ObjectId.isValid(courseId)) {
-    throw { status: 400, message: "Invalid courseId" };
+export const upsertCourseFeeService = async (dataArray) => {
+  if (!Array.isArray(dataArray)) {
+    throw { status: 400, message: "Expected an array of course fees" };
   }
 
-  return await CourseFee.findOneAndUpdate(
-    { courseId },
-    data,
-    { upsert: true, new: true }
-  );
-};
+  const results = [];
 
+  for (const data of dataArray) {
+    const { courseId } = data;
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      throw { status: 400, message: `Invalid courseId: ${courseId}` };
+    }
+
+    const updated = await CourseFee.findOneAndUpdate(
+      { courseId },
+      data,
+      { upsert: true, new: true }
+    );
+
+    results.push(updated);
+  }
+
+  return results;
+};
 /**
  * 🔹 Get all course fees by College ID
  */
