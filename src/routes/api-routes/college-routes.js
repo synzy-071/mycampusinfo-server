@@ -20,13 +20,17 @@ import { compareSchools } from "../../controllers/compare-controllers.js";
 import { predictColleges } from "../../controllers/predictor-controllers.js";
 
 /* ===== College Core ===== */
-
+import { uploadPhotos, uploadLogo, uploadVideo } from "../../../config/cloudinary.js";
 import {
+    uploadCollegePhotos,
+    uploadCollegeLogo,
+    uploadCollegeVideo,
+    deleteCollegePhoto,
     addCollege,
     getColleges,
 
     getCollegeById,
-  updateCollegeById,
+    updateCollegeById,
     deleteCollegeByAuthId,
 } from "../../controllers/college-controller.js";
 
@@ -300,4 +304,12 @@ router.delete("/admission/:collegeId", deleteAdmissionTimeline);
 router.post("/predict-colleges", predictColleges);
 
 
+// Upload routes — collegeId in params
+router.post("/:collegeId/upload/photos", uploadPhotos.array("photos", 10), uploadCollegePhotos);
+router.post("/:collegeId/upload/logo",   uploadLogo.single("logo"),         uploadCollegeLogo);
+router.post("/:collegeId/upload/video",  uploadVideo.single("video"),        uploadCollegeVideo);
+router.delete("/:collegeId/photo/:publicId", deleteCollegePhoto);
+
 export default router;
+
+
