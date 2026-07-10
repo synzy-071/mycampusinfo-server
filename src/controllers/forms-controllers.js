@@ -109,28 +109,33 @@ export const submitBulkForms = async (req, res) => {
     res.status(err.status || 500).json({ status: "failed", message: err.message });
   }
 };
-
 export const updateFormStatus = async (req, res) => {
   try {
     const { formId } = req.params;
-    const { status } = req.query;
-    const { note } = req.body;
+    const { status, note } = req.body;
 
-    if (status === 'Interview' && (!note || note.trim() === '')) {
+    if (status === "Interview" && (!note || note.trim() === "")) {
       return res.status(400).json({
         status: "failed",
-        message: "An interview note is required when the status is 'Call for Interview'."
+        message: "An interview note is required when the status is 'Interview'.",
       });
     }
 
     const data = await updateFormStatusService(formId, status, note);
-    res.status(200).json({ status: "success", message: "Form status updated", data });
+
+    res.status(200).json({
+      status: "success",
+      message: "Form status updated",
+      data,
+    });
   } catch (err) {
     console.error("Error caught in controller:", err);
-    res.status(err.status || 500).json({ status: "failed", message: err.message });
+    res.status(err.status || 500).json({
+      status: "failed",
+      message: err.message,
+    });
   }
 };
-
 export const deleteForm = async (req, res) => {
   try {
     const { formId } = req.params;

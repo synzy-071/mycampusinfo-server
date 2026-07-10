@@ -1,28 +1,32 @@
 import admin from "firebase-admin";
-import {getApps, getApp} from "firebase-admin/app";
-
+import { getApps } from "firebase-admin/app";
+//import serviceAccount from "../../config/firebase-service-account.json" with { type: "json" };
+import dotenv from "dotenv";
+dotenv.config();
 const serviceAccount = JSON.parse(process.env.FCM_SERVER_KEY);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
-// Check if an app already exists
-const app = getApps().length === 0
-  ? admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    })
-  : getApp();
-
+if (!getApps().length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
 export const pushNotification = async ({ deviceToken, title, body }) => {
   try {
+ 
     const message = {
       token: deviceToken,
-      notification: { title, body },
+      notification: {
+        title,
+        body,
+      },
     };
-    return await admin.messaging().send(message);
+
+    const response = await admin.messaging().send(message);
+
+  
+
+    return response;
   } catch (err) {
-    console.error("Push Notification Error:", err);
+ 
     throw err;
   }
 };
-
