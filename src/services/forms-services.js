@@ -4,7 +4,8 @@ import Student from "../models/user/user-model.js";
 import College from "../models/school_details/college_model.js";
 import AdmissionTimeline from "../models/school_details/admission-timeline-model.js";
 import StudentApplication from "../models/application/application-model.js";
-// import { createNotificationService } from "./notification-services.js";
+import Auth from "../models/auth/auth-model.js";
+import { pushNotification } from "../utils/send-notification.js";
 
 /**
  * Get forms for a studId (all forms created by that account).
@@ -219,38 +220,82 @@ export const submitBulkFormsService = async (studId, forms, formId, applicationI
  */
 export const updateFormStatusService = async (formId, status, note) => {
   const updateData = { status };
-  if (status === 'Interview' && note) updateData.interviewNote = note;
 
-  const form = await Form.findByIdAndUpdate(formId, updateData, { new: true });
-  if (!form) throw { status: 404, message: "Form not found" };
+  if (status === "Interview" && note) {
+    updateData.interviewNote = note;
+  }
+
+  const form = await Form.findByIdAndUpdate(formId, updateData, {
+    new: true,
+  });
+
+  if (!form) {
+    throw { status: 404, message: "Form not found" };
+  }
 
   const student = await Student.findById(form.studId);
-  if (!student) throw { status: 404, message: "Student not found for this form" };
+
+  if (!student) {
+    throw { status: 404, message: "Student not found for this form" };
+  }
 
   const college = await College.findById(form.collegeId);
-  if (!college) throw { status: 404, message: "College not found for this form" };
 
-  // switch (status) {
-  //   case 'Accepted':
-  //     await createNotificationService({ title: 'Application Accepted', body: `Your application to ${college.name} has been accepted`, authId: student.authId, notificationType: 'Accepted' });
-  //     break;
-  //   case 'Rejected':
-  //     await createNotificationService({ title: 'Application Rejected', body: `Your application to ${college.name} has been rejected`, authId: student.authId, notificationType: 'Rejected' });
-  //     break;
-  //   case 'Reviewed':
-  //     await createNotificationService({ title: 'Application Under Review', body: `Your application to ${college.name} is under review`, authId: student.authId, notificationType: 'Reviewed' });
-  //     break;
-  //   case 'Interview':
-  //     await createNotificationService({
-  //       title: 'Interview Invitation',
-  //       body: `You've been invited for an interview at ${college.name}. Note: "${note}"`,
-  //       authId: student.authId,
-  //       notificationType: 'Interview'
-  //     });
-  //     break;
-  //   default:
-  //     break;
-  // }
+  if (!college) {
+    throw { status: 404, message: "College not found for this form" };
+  }
+
+  const auth = await Auth.findById(student.authId);
+console.log("========== UPDATE STATUS ==========");
+console.log("Student ID:", student._id);
+console.log("Student Auth ID:", student.authId);
+console.log("Auth Found:", auth);
+console.log("Device Token:", auth?.deviceToken);
+console.log("Status:", status);
+console.log("===================================");
+  let title = "";
+  let body = "";
+
+  switch (status) {
+    case "Accepted":
+      title = "Application Accepted";
+      body = `Your application to ${college.name} has been accepted.`;
+      break;
+
+    case "Rejected":
+      title = "Application Rejected";
+      body = `Your application to ${college.name} has been rejected.`;
+      break;
+
+    case "Reviewed":
+      title = "Application Under Review";
+      body = `Your application to ${college.name} is under review.`;
+      break;
+
+    case "Interview":
+      title = "Interview Invitation";
+      body = note
+        ? `You've been invited for an interview at ${college.name}. Note: ${note}`
+        : `You've been invited for an interview at ${college.name}.`;
+      break;
+
+    default:
+      break;
+  }
+
+  if (auth?.deviceToken && title) {
+    try {
+      await pushNotification({
+        deviceToken: auth.deviceToken,
+        title,
+        body,
+      });
+
+      console.log(`Notification sent to ${student.name}`);
+    } catch (err) {
+      console.error("Push notification failed:", err);
+    }
+  }
 
   return form;
 };
