@@ -9,32 +9,48 @@ import StudentApplication from "../models/application/application-model.js";
 /**
  * Get forms for a studId (all forms created by that account).
  * Optional `status` to filter.
- */
-export const getFormsByStudentService = async (studId, status) => {
+ */export const getFormsByStudentService = async (studId, status) => {
   const query = { studId };
   if (status) query.status = status;
 
   const forms = await Form.find(query)
-    .populate({ path: 'applicationForm', select: 'pdfFile' })
-    .populate({ path: 'applicationId', select: 'name studId' })
-    .populate({ path: 'collegeId', select: 'name collegeMode genderType shifts state city' })
-    .populate({ path: 'studId', select: 'name' })
+    .populate({ path: "applicationForm", select: "pdfFile" })
+    .populate({ path: "applicationId", select: "name studId" })
+    .populate({
+      path: "collegeId",
+      select: "name collegeMode genderType shifts state city",
+    })
+    .populate({ path: "studId", select: "name" })
     .sort({ createdAt: -1 });
 
   for (const form of forms) {
-    const admissionTimeline = await AdmissionTimeline.findOne({ collegeId: form.collegeId, 'timelines._id': form.timelineId });
-    const timelines = admissionTimeline.timelines;
-    const timeline = timelines.find(t => t._id.toString() === form.timelineId.toString());
-    const populatedForm = await form.populate({
-      path: 'timelineId',
-      select: 'admissionStartDate admissionEndDate status applicationFee courseId documentsRequired eligibility'
+    const admissionTimeline = await AdmissionTimeline.findOne({
+      collegeId: form.collegeId,
+      "timelines._id": form.timelineId,
     });
-    form.timelineId = timeline;
+
+    // Timeline may have been deleted or no longer exists.
+    // Skip instead of crashing the API.
+    if (!admissionTimeline) {
+      form.timelineId = null;
+      continue;
+    }
+
+    const timeline = admissionTimeline.timelines.find(
+      (t) => t._id.toString() === form.timelineId.toString()
+    );
+
+    await form.populate({
+      path: "timelineId",
+      select:
+        "admissionStartDate admissionEndDate status applicationFee courseId documentsRequired eligibility",
+    });
+
+    form.timelineId = timeline ?? null;
   }
 
   return forms;
 };
-
 export const getFormsByTimelineService = async (timelineId, status) => {
   const query = { timelineId };
   if (status) query.status = status;
