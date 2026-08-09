@@ -4,16 +4,16 @@ import OTP from '../models/auth/otp-model.js';
 import { sendVerificationEmail, sendOtpToEmail } from '../utils/email.js';
 import mongoose from 'mongoose';
 // import { createNotificationService } from './notification-services.js';
- import { pushNotification } from '../utils/send-notification.js';
+import { pushNotification } from '../utils/send-notification.js';
 
-export const getAuth = async ({authId}) => {
+export const getAuth = async ({ authId }) => {
   const auth = await Auth.findById(new mongoose.Types.ObjectId(authId));
 
   if (!auth) {
     throw {
-        status: 404,
-        message: 'Auth data not found',
-      };
+      status: 404,
+      message: 'Auth data not found',
+    };
   }
   return { auth };
 };
@@ -73,11 +73,17 @@ export const loginUserService = async ({ email, password, deviceToken }) => {
   // Update latest device token
   auth.deviceToken = deviceToken;
   await auth.save();
-await pushNotification({
-  deviceToken: auth.deviceToken,
-  title: "Logged In",
-  body: "You have successfully logged in.",
-});
+  if (auth.deviceToken && auth.deviceToken !== "null" && auth.deviceToken !== "undefined") {
+    try {
+      await pushNotification({
+        deviceToken: auth.deviceToken,
+        title: "Logged In",
+        body: "You have successfully logged in.",
+      });
+    } catch (error) {
+      console.error("Push notification failed during login:", error.message);
+    }
+  }
   return { auth, token };
 };
 
