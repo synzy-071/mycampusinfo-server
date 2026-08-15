@@ -5,3 +5,4 @@ export { default as chatbotRoutes } from './chatbot-routes.js';
 export { default as collegeRoutes } from './college-routes.js';
 export { default as formRoutes } from './form-routes.js';
 export { default as paymentRoutes } from './payment-routes.js';
+export { default as adminRoutes } from './admin-routes.js';
