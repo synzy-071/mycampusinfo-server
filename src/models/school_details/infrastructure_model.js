@@ -45,6 +45,6 @@ const InfrastructureSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Infrastructure = mongoose.model('infrastructure', InfrastructureSchema);
+const Infrastructure = mongoose.model('infrastructure', InfrastructureSchema, 'college_infrastructure');
 
 export default Infrastructure;

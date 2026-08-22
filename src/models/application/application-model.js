@@ -12,7 +12,27 @@ const StudentApplicationSchema = new mongoose.Schema({
   placeOfBirth: { type: String, default: null },
   speciallyAbled: { type: Boolean, default: false },
   nationality: { type: String, required: true },
-category :{type:String,required :true},
+  religion: { type: String, required: false },
+  category: { type: String, required: true },
+  caste: { type: String, required: false },
+  subcaste: { type: String, required: false },
+  aadharNo: { type: String, required: false },
+  bloodGroup: { type: String, required: false },
+  allergicTo: { type: String, required: false },
+  interest: { type: String, required: false },
+  speciallyAbledType: { type: String, required: false },
+  age: { type: Number, required: false },
+
+  // College & Application Information
+  collegeId: { type: mongoose.Schema.Types.ObjectId, ref: 'college', required: false },
+  collegeName: { type: String, required: false },
+  collegeEmail: { type: String, required: false },
+
+  // Address Details
+  presentAddress: { type: String, required: false },
+  permanentAddress: { type: String, required: false },
+  homeLanguage: { type: String, required: false },
+
   // Parent Details
   fatherName: { type: String, required: false },
   fatherAge: { type: Number, required: false },
@@ -20,6 +40,7 @@ category :{type:String,required :true},
   fatherProfession: { type: String, required: false },
   fatherAnnualIncome: { type: String, required: false },
   fatherPhoneNo: { type: String, required:  false },
+  fatherAadharNo: { type: String, required: false },
   fatherEmail: { type: String, required: false },
 
   motherName: { type: String, required: false },
@@ -28,9 +49,31 @@ category :{type:String,required :true},
   motherProfession: { type: String, required: false },
   motherAnnualIncome: { type: String, required: false },
   motherPhoneNo: { type: String, required: false },
+  motherAadharNo: { type: String, required: false },
   motherEmail: { type: String, required: false },
 
+  // Guardian Details
+  guardianName: { type: String, required: false },
+  guardianAge: { type: Number, required: false },
+  guardianContactNo: { type: String, required: false },
+  guardianRelationToStudent: { type: String, required: false },
+  guardianQualification: { type: String, required: false },
+  guardianProfession: { type: String, required: false },
+  guardianEmail: { type: String, required: false },
+  guardianAadharNo: { type: String, required: false },
+  guardianAnnualIncome: { type: String, required: false },
+
   yearlyBudget: { type: String, required: false },
+  relationshipStatus: { type: String, required: false },
+  siblings: [
+    {
+      name: { type: String },
+      age: { type: Number },
+      sex: { type: String },
+      nameOfInstitute: { type: String },
+      className: { type: String }
+    }
+  ],
 
   // 🎓 Course Preferences (STRING only)
   coursePreferences: [
@@ -44,17 +87,26 @@ category :{type:String,required :true},
   latestQualification: {
     level: {
       type: String,
-      enum: ['10th', '12th', 'Diploma', 'UG', 'PG'],
       required: true
     },
-
   },
+  
+  // 🎓 Current Grade / Qualification
+  currentGrade: {
+    type: String,
+    required: false
+  },
+
+  board: { type: String, required: false },
+  lastcollegeName: { type: String, required: false },
+  classCompleted: { type: String, required: false },
+  lastAcademicYear: { type: String, required: false },
+  reasonForLeaving: { type: String, required: false },
 
   // 📚 Academic Details
   academicDetails: {
     stream: {
       type: String,
-      enum: ['PCM', 'PCB', 'PCMB', 'Arts', 'Commerce', 'Other'],
       required: true
     },
     subjects: [

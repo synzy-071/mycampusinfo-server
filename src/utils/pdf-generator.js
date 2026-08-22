@@ -146,18 +146,26 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
         hr();
       };
 
+      // College Information
+      if (student.collegeName || student.collegeEmail) {
+         drawSectionAsTable("College Information", [
+           ["College Name", student.collegeName ?? "-"],
+           ["College Email", student.collegeEmail ?? "-"]
+         ]);
+      }
+
       // Student Basic Info
       drawSectionAsTable("Student Basic Information", [
         ["Name", student.name || student.nameOfChild],
         ["Date of Birth", student.dob ? new Date(student.dob).toLocaleDateString() : "-"],
         ["Age", student.age ?? "-"],
         ["Gender", student.gender ?? "-"],
+        ["Category", student.category ?? "-"],
         ["Mother Tongue", student.motherTongue ?? "-"],
         ["Place of Birth", student.placeOfBirth ?? "-"],
         ["Specially Abled", student.speciallyAbled ? "Yes" : "No"],
         ["Specially Abled Type", student.speciallyAbledType ?? "-"],
         ["Nationality", student.nationality ?? "-"],
-        ["Standard", student.standard ?? "-"],
         ["Religion", student.religion ?? "-"],
         ["Caste", student.caste ?? "-"],
         ["Subcaste", student.subcaste ?? "-"],
@@ -170,8 +178,8 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
       ]);
 
       // Previous School & Address (each as its own section)
-      drawSectionAsTable("Previous School Information", [
-        ["Last School Name", student.lastSchoolName ?? "-"],
+      drawSectionAsTable("Previous Academic Information", [
+        ["Last Institute Name", student.lastcollegeName || student.lastSchoolName || "-"],
         ["Class Completed", student.classCompleted ?? "-"],
         ["Last Academic Year", student.lastAcademicYear ?? "-"],
         ["Reason For Leaving", student.reasonForLeaving ?? "-"],
@@ -183,8 +191,46 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
         ["Permanent Address", student.permanentAddress ?? "-"]
       ]);
 
-      // Add new page for parent details if current page is too full
+      if (student.latestQualification || student.academicDetails || student.currentGrade || student.stream) {
+        drawSectionAsTable("Academic Details", [
+          ["Latest Qualification", student.latestQualification?.level ?? "-"],
+          ["Current Grade", student.currentGrade ?? "-"],
+          ["Stream", student.academicDetails?.stream ?? student.stream ?? "-"],
+          ["Overall Percentage", student.academicDetails?.overallPercentage ?? "-"]
+        ]);
+        
+        if (student.academicDetails?.subjects && student.academicDetails.subjects.length > 0) {
+           const subjectRows = student.academicDetails.subjects.map(sub => [
+             sub.subjectName ?? "-", 
+             `${sub.marksObtained ?? "-"} / ${sub.maxMarks ?? "-"}`
+           ]);
+           drawSectionAsTable("Subject Marks", subjectRows);
+        }
+      }
+
+      if (student.coursePreferences && student.coursePreferences.length > 0) {
+         const prefRows = student.coursePreferences
+           .sort((a,b) => (a.priority || 99) - (b.priority || 99))
+           .map(pref => [`Priority ${pref.priority ?? "-"}`, pref.courseName ?? "-"]);
+         drawSectionAsTable("Course Preferences", prefRows);
+      }
+
+      // Add new page for parent/guardian details if current page is too full
       doc.addPage();
+
+      if (student.guardianName || student.guardianContactNo || student.guardianEmail) {
+        drawSectionAsTable("Guardian Details", [
+          ["Name", student.guardianName ?? "-"],
+          ["Age", student.guardianAge ?? "-"],
+          ["Qualification", student.guardianQualification ?? "-"],
+          ["Profession", student.guardianProfession ?? "-"],
+          ["Annual Income", student.guardianAnnualIncome ?? "-"],
+          ["Phone No", student.guardianContactNo ?? "-"],
+          ["Email", student.guardianEmail ?? "-"],
+          ["Aadhar No", student.guardianAadharNo ?? "-"],
+          ["Relation", student.guardianRelationToStudent ?? "-"]
+        ]);
+      }
 
       drawSectionAsTable("Father Details", [
         ["Name", student.fatherName ?? "-"],
@@ -211,6 +257,7 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
       drawSectionAsTable("Family Information", [
         ["Relationship Status", student.relationshipStatus ?? "-"]
       ]);
+
 
       // siblings
       if (Array.isArray(student.siblings) && student.siblings.length > 0) {

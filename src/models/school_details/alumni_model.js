@@ -49,5 +49,5 @@ const AlumniSchema = new mongoose.Schema(
   }
 );
 
-const Alumni = mongoose.model("alumnis", AlumniSchema);
+const Alumni = mongoose.model('alumnis', AlumniSchema, 'college_alumnis');
 export default Alumni;

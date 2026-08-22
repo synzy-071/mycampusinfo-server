@@ -39,10 +39,37 @@ const CollegeSchema = new mongoose.Schema({
             "More than 5 Lakh"
         ]
     },
+    feesTransparency: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     stream: {
         type: String,
-        required: true,
+        required: false, // Made optional for backward compatibility
         enum: ['Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities'] 
+    },
+    streamsOffered: {
+        type: [String],
+        enum: ['Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities'],
+        default: []
+    },
+    programLevels: {
+        type: [String],
+        enum: [
+            '10th Grade',
+            '11th Grade',
+            '12th Grade',
+            'Diploma',
+            'Undergraduate - 1st Year',
+            'Undergraduate - 2nd Year',
+            'Undergraduate - 3rd Year',
+            'Undergraduate - 4th Year',
+            'Graduate',
+            'Postgraduate',
+            'Other'
+        ],
+        default: []
     },
     email: { type: String, required: true },
     mobileNo: { type: String, required: true },

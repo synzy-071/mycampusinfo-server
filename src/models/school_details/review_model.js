@@ -42,4 +42,4 @@ const reviewSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-export default mongoose.model('reviews', reviewSchema);
+export default mongoose.model('reviews', reviewSchema, 'college_reviews');

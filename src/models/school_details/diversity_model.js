@@ -40,6 +40,6 @@ const OtherDetailsSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const OtherDetails = mongoose.model('otherDetails', OtherDetailsSchema);
+const OtherDetails = mongoose.model('otherDetails', OtherDetailsSchema, 'college_otherDetails');
 
 export default OtherDetails;

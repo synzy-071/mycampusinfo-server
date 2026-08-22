@@ -7,6 +7,8 @@ import CoursePlacement from "../models/school_details/placement_model.js"
 import mongoose from "mongoose";
 import cloudinary from "../../config/cloudinary.js";
 import streamifier from "streamifier";
+import Auth from "../models/auth/auth-model.js";
+import { pushNotification } from "../utils/send-notification.js";
 /* ADD COLLEGE */
 export const createCollegeService = async (data) => {
   const {
@@ -14,8 +16,7 @@ export const createCollegeService = async (data) => {
     area, acceptanceRate, collegeInfo, address, pinCode, collegeMode,
     genderType, shifts, feeRange, stream, email, mobileNo, specialist, tags,
     website, status, languageMedium, transportAvailable, TeacherToStudentRatio,
-    score, instagramHandle, twitterHandle, linkedinHandle
-
+    score, instagramHandle, twitterHandle, linkedinHandle, streamsOffered, programLevels
   } = data;
 
   const college = new College({
@@ -23,7 +24,7 @@ export const createCollegeService = async (data) => {
     acceptanceRate, collegeInfo, address, pinCode, collegeMode, genderType,
     shifts, feeRange, stream, email, mobileNo, specialist, tags, website, status,
     languageMedium, transportAvailable, TeacherToStudentRatio, score, instagramHandle,
-    twitterHandle, linkedinHandle
+    twitterHandle, linkedinHandle, streamsOffered, programLevels
   });
 
   return await college.save();
@@ -37,6 +38,19 @@ export const getAllCollegesService = async () => {
   return mapColleges;
 };
 
+/* GET COLLEGES BY STATUS */
+export const getCollegesByStatusService = async (status) => {
+  let colleges = await College.find({ status }).sort({ createdAt: -1 });
+  let mapColleges = await toCollegeCardModels(colleges);
+  return mapColleges;
+};
+
+/* GET PENDING COLLEGES */
+export const getPendingCollegesService = async () => {
+  let colleges = await College.find({ status: 'pending' }).sort({ createdAt: -1 });
+  let mapColleges = await toCollegeCardModels(colleges);
+  return mapColleges;
+};
 
 /* GET COLLEGE BY AUTH ID */
 export const getCollegeByIdService = async (collegeId) => {
@@ -76,8 +90,57 @@ export const getCollegeByIdService = async (collegeId) => {
 
 
 /* UPDATE BY AUTH ID */
-export const updateCollegeByIdService = (collegeId, data) => {
-  return College.findByIdAndUpdate(collegeId, data, { new: true });
+export const updateCollegeByIdService = async (collegeId, data) => {
+  const oldCollege = await College.findById(collegeId);
+  if (!oldCollege) {
+    throw Object.assign(new Error("College not found"), { statusCode: 404 });
+  }
+
+  // Safe partial update: remove empty strings, empty arrays, null, undefined from `data`
+  const cleanData = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined || value === null || value === "") {
+      continue;
+    }
+    if (Array.isArray(value) && value.length === 0) {
+      continue;
+    }
+    if (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0) {
+      continue;
+    }
+    cleanData[key] = value;
+  }
+
+  const updatedCollege = await College.findByIdAndUpdate(collegeId, cleanData, { new: true });
+
+  if (data.status && data.status !== oldCollege.status) {
+    const auth = await Auth.findById(updatedCollege.authId);
+    if (auth && auth.deviceToken) {
+      let title = "";
+      let body = "";
+      if (data.status === "accepted") {
+        title = "College Profile Approved";
+        body = `Congratulations! Your college profile for ${updatedCollege.name} has been approved.`;
+      } else if (data.status === "rejected") {
+        title = "College Profile Rejected";
+        body = `Your college profile for ${updatedCollege.name} has been rejected.`;
+      }
+      if (title && body) {
+        try {
+          await pushNotification({
+            deviceToken: auth.deviceToken,
+            title,
+            body,
+          });
+          console.log(`Status update notification sent to college ${updatedCollege.name}`);
+        } catch (err) {
+          console.error("Push notification failed:", err);
+        }
+      }
+    }
+  }
+
+  return updatedCollege;
 };
 
 

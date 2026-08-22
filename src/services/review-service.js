@@ -5,7 +5,7 @@ export const createReviewService = async (data) => {
 };
 
 export const getReviewsByCollegeIdService = async (collegeId) => {
-  return await Review.find({ collegeId, status: "Accepted" }).sort({ createdAt: -1 });
+  return await Review.find({ collegeId, status: { $ne: "Rejected" } }).sort({ createdAt: -1 });
 };
 
 export const updateReviewStatusService = async (id, status) => {

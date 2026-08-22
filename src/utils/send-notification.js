@@ -9,7 +9,7 @@ if (!getApps().length) {
     credential: admin.credential.cert(serviceAccount),
   });
 }
-export const pushNotification = async ({ deviceToken, title, body }) => {
+export const pushNotification = async ({ deviceToken, title, body, data }) => {
   try {
  
     const message = {
@@ -19,6 +19,15 @@ export const pushNotification = async ({ deviceToken, title, body }) => {
         body,
       },
     };
+
+    if (data) {
+      // Ensure all data values are strings for FCM
+      const stringifiedData = {};
+      for (const [key, value] of Object.entries(data)) {
+        stringifiedData[key] = String(value);
+      }
+      message.data = stringifiedData;
+    }
 
     const response = await admin.messaging().send(message);
 

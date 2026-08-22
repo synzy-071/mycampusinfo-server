@@ -23,6 +23,11 @@ const PreferenceSchema = new mongoose.Schema(
             required: true,
             enum: ['Engineering', 'Management', 'Arts', 'Science', 'Law', 'Medical', 'Design', 'Humanities']
         },
+        currentGrade: {
+            type: String,
+            required: true,
+            enum: ['10th Grade', '11th Grade', '12th Grade', 'Diploma', 'Undergraduate - 1st Year', 'Undergraduate - 2nd Year', 'Undergraduate - 3rd Year', 'Undergraduate - 4th Year', 'Graduate', 'Postgraduate', 'Other']
+        },
         interests: {
             type: String,
             enum: [

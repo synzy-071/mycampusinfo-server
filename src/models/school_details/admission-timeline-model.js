@@ -59,6 +59,6 @@ const AdmissionTimelineSchema = new mongoose.Schema(
 
 const AdmissionTimeline =
     mongoose.models.AdmissionTimeline ||
-    mongoose.model('AdmissionTimeline', AdmissionTimelineSchema);
+    mongoose.model('AdmissionTimeline', AdmissionTimelineSchema, 'college_admission_timeline');
 
 export default AdmissionTimeline;

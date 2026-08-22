@@ -8,6 +8,8 @@ import {
   uploadCollegeLogoService,
   uploadCollegeVideoService,
   deleteCollegePhotoService,
+  getCollegesByStatusService,
+  getPendingCollegesService,
 } from "../services/college-service.js";
 
 /* ADD */
@@ -24,6 +26,29 @@ export const addCollege = async (req, res) => {
 export const getColleges = async (req, res) => {
   try {
     const colleges = await getAllCollegesService();
+    res.json({ success: true, data: colleges });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* GET BY STATUS */
+export const getCollegesByStatus = async (req, res) => {
+  try {
+    const colleges = await getCollegesByStatusService(req.params.status);
+    if (!colleges || colleges.length === 0) {
+      return res.status(200).json({ success: true, data: [], message: 'No colleges found with status' });
+    }
+    res.json({ success: true, data: colleges });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* GET PENDING */
+export const getPendingColleges = async (req, res) => {
+  try {
+    const colleges = await getPendingCollegesService();
     res.json({ success: true, data: colleges });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

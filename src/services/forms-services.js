@@ -289,6 +289,12 @@ console.log("===================================");
         deviceToken: auth.deviceToken,
         title,
         body,
+        data: {
+          studentId: String(student._id),
+          applicationId: String(form.applicationId || form._id),
+          collegeId: String(college._id),
+          status: String(status)
+        }
       });
 
       console.log(`Notification sent to ${student.name}`);

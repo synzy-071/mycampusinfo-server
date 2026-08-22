@@ -17,5 +17,5 @@ const AmenitiesSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Amenities = mongoose.model('amenities', AmenitiesSchema);
+const Amenities = mongoose.model('amenities', AmenitiesSchema, 'college_amenities');
 export default Amenities;

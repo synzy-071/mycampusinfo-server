@@ -32,6 +32,8 @@ import {
     getCollegeById,
     updateCollegeById,
     deleteCollegeByAuthId,
+    getCollegesByStatus,
+    getPendingColleges,
 } from "../../controllers/college-controller.js";
 
 import {
@@ -173,6 +175,8 @@ router.post('/predict-colleges', predictColleges);
 /* ===================== CORE ===================== */
 router.post("/add", addCollege);
 router.get("/", getColleges);
+router.get("/pending", getPendingColleges);
+router.get("/status/:status", getCollegesByStatus);
 router.get("/:collegeId", getCollegeById);
 
 router.put("/:collegeId", updateCollegeById);
