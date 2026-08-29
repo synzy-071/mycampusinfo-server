@@ -35,6 +35,6 @@ const FacultySchema = new mongoose.Schema({
   facultyMembers: [FacultyMemberSchema]
 }, { timestamps: true });
 
-const Faculty = mongoose.model('faculty', FacultySchema);
+const Faculty = mongoose.model('faculty', FacultySchema, 'college_faculty');
 
 export default Faculty;

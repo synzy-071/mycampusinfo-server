@@ -3,7 +3,21 @@ import Course from "../models/school_details/course-model.js";
 
 /* ================= ADD ================= */
 export const addCoursePlacementService = async (data) => {
-  return await CoursePlacement.create(data);
+  if (data.placements && Array.isArray(data.placements)) {
+    // Delete existing placements for this course
+    await CoursePlacement.deleteMany({ courseId: data.courseId });
+    // Insert new placements
+    return await CoursePlacement.insertMany(
+      data.placements.map(p => ({ ...p, courseId: data.courseId }))
+    );
+  } else {
+    // Fallback for single placement
+    return await CoursePlacement.findOneAndUpdate(
+      { courseId: data.courseId, year: data.year },
+      { $set: data },
+      { new: true, upsert: true }
+    );
+  }
 };
 
 /* ================= GET BY COURSE ================= */

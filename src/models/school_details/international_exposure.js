@@ -58,6 +58,6 @@ const InternationalExposureSchema = new mongoose.Schema({
   globalTieUps: [GlobalTieUpSchema]
 }, { timestamps: true });
 
-const InternationalExposure = mongoose.model('internationalExposure', InternationalExposureSchema);
+const InternationalExposure = mongoose.model('internationalExposure', InternationalExposureSchema, 'college_internationalExposure');
 
 export default InternationalExposure;

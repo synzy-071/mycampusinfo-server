@@ -5,6 +5,7 @@ import College from "../models/school_details/college_model.js";
 import AdmissionTimeline from "../models/school_details/admission-timeline-model.js";
 import StudentApplication from "../models/application/application-model.js";
 import Auth from "../models/auth/auth-model.js";
+import Notification from "../models/notification/notifications-model.js";
 import { pushNotification } from "../utils/send-notification.js";
 
 /**
@@ -221,8 +222,10 @@ export const submitBulkFormsService = async (studId, forms, formId, applicationI
 export const updateFormStatusService = async (formId, status, note) => {
   const updateData = { status };
 
-  if (status === "Interview" && note) {
+  if ((status === "Interview" || status === "WrittenExam") && note) {
     updateData.interviewNote = note;
+  } else if (note) {
+    updateData.note = note;
   }
 
   const form = await Form.findByIdAndUpdate(formId, updateData, {
@@ -283,12 +286,40 @@ console.log("===================================");
       break;
   }
 
+  if (title && body) {
+    try {
+      // Create in-app notification in DB
+      await Notification.create({
+        authId: student.authId,
+        title,
+        body,
+        notificationType: status,
+        data: {
+          studentId: String(student._id),
+          applicationId: String(form.applicationId || form._id),
+          collegeId: String(college._id),
+          status: String(status)
+        },
+        path: `/application-status` // Or link to the specific application page
+      });
+      console.log(`In-app Notification saved to database for ${student.name}`);
+    } catch (dbErr) {
+      console.error("Error creating Notification document:", dbErr);
+    }
+  }
+
   if (auth?.deviceToken && title) {
     try {
       await pushNotification({
         deviceToken: auth.deviceToken,
         title,
         body,
+        data: {
+          studentId: String(student._id),
+          applicationId: String(form.applicationId || form._id),
+          collegeId: String(college._id),
+          status: String(status)
+        }
       });
 
       console.log(`Notification sent to ${student.name}`);

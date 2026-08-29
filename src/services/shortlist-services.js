@@ -21,7 +21,7 @@ export const addToShortlistService = async ({ authId, collegeId }) => {
      
   }
 
-  if (student.shortlistedSchools.includes(collegeId)) {
+  if (student.shortlistedSchools.some(id => id.toString() === collegeId.toString())) {
     throw {status:400, message:"School already in shortlist"};
   }
 
@@ -56,7 +56,7 @@ export const removeShortlistService = async ({ authId, collegeId }) => {
   }
 
   student.shortlistedSchools = student.shortlistedSchools.filter(
-    (id) => id.toString() !== collegeId
+    (id) => id.toString() !== collegeId.toString()
   );
 
   await student.save();

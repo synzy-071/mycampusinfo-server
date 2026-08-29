@@ -52,6 +52,6 @@ const SafetyAndSecuritySchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const SafetyAndSecurity = mongoose.model('safetyAndSecurity', SafetyAndSecuritySchema);
+const SafetyAndSecurity = mongoose.model('safetyAndSecurity', SafetyAndSecuritySchema, 'college_safetyAndSecurity');
 
 export default SafetyAndSecurity;

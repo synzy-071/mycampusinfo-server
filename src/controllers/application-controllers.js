@@ -27,7 +27,11 @@ export const addStudApplication = async (req, res) => {
 
 export const getAllStudApplication = async (req, res) => {
   try {
-    const applications = await getAllStudApplicationsService();
+    const filter = {};
+    if (req.query.collegeId) filter.collegeId = req.query.collegeId;
+    if (req.query.schoolId) filter.schoolId = req.query.schoolId;
+
+    const applications = await getAllStudApplicationsService(filter);
     res.status(200).json({
       status: "success",
       message: "Fetched all applications successfully",

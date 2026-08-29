@@ -15,8 +15,8 @@ export const addCoursesService = async (collegeId, courses) => {
   for (const c of courses) {
     const { courseName, duration, intake, category } = c;
 
-    if (!courseName || !duration || !intake || !category) {
-      throw { status: 400, message: "Missing required course fields" };
+    if (!courseName) {
+      throw { status: 400, message: "Missing required courseName" };
     }
 
     const course = await Course.create({

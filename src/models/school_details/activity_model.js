@@ -29,5 +29,5 @@ const ActivitiesSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-const Activities = mongoose.model('activities', ActivitiesSchema);
+const Activities = mongoose.model('activities', ActivitiesSchema, 'college_activities');
 export default Activities;
