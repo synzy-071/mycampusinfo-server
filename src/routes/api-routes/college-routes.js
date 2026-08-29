@@ -7,6 +7,23 @@ import {
     updateHostel,
     deleteHostel,
 } from "../../controllers/hostel-controller.js";
+
+/* ===== Academics ===== */
+import {
+    addAcademics,
+    getAcademicsByCollegeId,
+    updateAcademics,
+    deleteAcademics,
+} from "../../controllers/academics-controller.js";
+
+/* ===== Technology Adoption ===== */
+import {
+    addTechnologyAdoption,
+    getTechnologyAdoptionByCollegeId,
+    updateTechnologyAdoption,
+    deleteTechnologyAdoption,
+} from "../../controllers/technology-adoption-controller.js";
+
 /*=======BLOG=======*/
 import {
     createBlog,
@@ -177,33 +194,12 @@ router.post("/add", addCollege);
 router.get("/", getColleges);
 router.get("/pending", getPendingColleges);
 router.get("/status/:status", getCollegesByStatus);
-router.get("/:collegeId", getCollegeById);
-
-router.put("/:collegeId", updateCollegeById);
-
-router.delete("/:collegeId", deleteCollegeByAuthId);
 
 //courses
 /* ===================== COURSES ===================== */
 router.post("/course/add", addCourse);
 router.get("/courses/college/:collegeId", getCoursesByCollege);
 router.put("/course/:courseId", updateCourse);
-
-//===================hostels=====================
-
-router.get(
-    "/hostel/:collegeId",
-    getHostelsByCollegeId
-);
-
-// Add hostel
-router.post("/hostel/add", addHostel);
-
-// Update hostel
-router.put("/hostel/:id", updateHostel);
-
-// Delete hostel (soft)
-router.delete("/hostel/:id", deleteHostel);
 
 /* ===================== EXAMS (COURSE BASED) ===================== */
 router.post("/exam", addCourseExams);       // add exams (course based)
@@ -304,15 +300,32 @@ router.get("/admission/:collegeId", getAdmissionTimelineByCollegeId);
 router.put("/admission/:collegeId", updateAdmissionTimeline);
 router.delete("/admission/:collegeId", deleteAdmissionTimeline);
 
+/* ===================== ACADEMICS ===================== */
+router.post("/academics/add", addAcademics);
+router.get("/academics/:collegeId", getAcademicsByCollegeId);
+router.put("/academics/:collegeId", updateAcademics);
+router.delete("/academics/:collegeId", deleteAcademics);
+
+/* ===================== TECHNOLOGY ADOPTION ===================== */
+router.post("/technology-adoption/add", addTechnologyAdoption);
+router.get("/technology-adoption/:collegeId", getTechnologyAdoptionByCollegeId);
+router.put("/technology-adoption/:collegeId", updateTechnologyAdoption);
+router.delete("/technology-adoption/:collegeId", deleteTechnologyAdoption);
+
 /*===================== FEATURES =============== */
 router.post("/predict-colleges", predictColleges);
 
 
 // Upload routes — collegeId in params
 router.post("/:collegeId/upload/photos", uploadPhotos.array("photos", 10), uploadCollegePhotos);
-router.post("/:collegeId/upload/logo",   uploadLogo.single("logo"),         uploadCollegeLogo);
-router.post("/:collegeId/upload/video",  uploadVideo.single("video"),        uploadCollegeVideo);
+router.post("/:collegeId/upload/logo", uploadLogo.single("logo"), uploadCollegeLogo);
+router.post("/:collegeId/upload/video", uploadVideo.single("video"), uploadCollegeVideo);
 router.delete("/:collegeId/photo/:publicId", deleteCollegePhoto);
+
+// ⚠️ WILDCARD ROUTES MUST BE LAST — otherwise they shadow all specific routes above
+router.get("/:collegeId", getCollegeById);
+router.put("/:collegeId", updateCollegeById);
+router.delete("/:collegeId", deleteCollegeByAuthId);
 
 export default router;
 

@@ -18,7 +18,6 @@ const HostelSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: ["Boys", "Girls", "Co-Ed"],
-      required: true,
     },
 
     capacity: {

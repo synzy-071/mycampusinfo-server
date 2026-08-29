@@ -11,6 +11,8 @@ export const addCourseExamsService = async (courseId, exams) => {
     throw { status: 400, message: "Exams must be a non-empty array" };
   }
 
+  await CourseExam.deleteMany({ courseId });
+
   return await CourseExam.insertMany(
     exams.map(e => ({ ...e, courseId }))
   );

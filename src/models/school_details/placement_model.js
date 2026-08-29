@@ -16,6 +16,7 @@ const CoursePlacementSchema = new mongoose.Schema(
 
     minPackage: { type: Number, required: true },
     maxPackage: { type: Number, required: true },
+    averagePackage: { type: Number },
 
     companies: { type: [String], default: [] },
   },

@@ -10,9 +10,9 @@ const CourseSchema = new mongoose.Schema(
     },
 
     courseName: { type: String, required: true },
-    duration: { type: String, required: true },
-    intake: { type: Number, required: true },
-    category: { type: String, required: true },
+    duration: { type: String },
+    intake: { type: Number },
+    category: { type: String },
   },
   { timestamps: true }
 );

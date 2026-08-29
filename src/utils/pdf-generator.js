@@ -146,17 +146,27 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
         hr();
       };
 
-      // College Information
-      if (student.collegeName || student.collegeEmail) {
-         drawSectionAsTable("College Information", [
-           ["College Name", student.collegeName ?? "-"],
-           ["College Email", student.collegeEmail ?? "-"]
-         ]);
+      // Application Details (Main Box at top)
+      const appDetailsRows = [
+        ["Application Date", student.createdAt ? new Date(student.createdAt).toLocaleDateString() : new Date().toLocaleDateString()],
+        ["College Applying To", student.collegeName ?? "-"],
+        ["College Email", student.collegeEmail ?? "-"]
+      ];
+
+      if (student.coursePreferences && student.coursePreferences.length > 0) {
+         student.coursePreferences
+           .sort((a,b) => (a.priority || 99) - (b.priority || 99))
+           .forEach(pref => {
+               appDetailsRows.push([`Course Preference ${pref.priority ?? "-"}`, pref.courseName ?? "-"]);
+           });
       }
+
+      drawSectionAsTable("Application Details", appDetailsRows);
 
       // Student Basic Info
       drawSectionAsTable("Student Basic Information", [
         ["Name", student.name || student.nameOfChild],
+        ["Location", student.location ?? "-"],
         ["Date of Birth", student.dob ? new Date(student.dob).toLocaleDateString() : "-"],
         ["Age", student.age ?? "-"],
         ["Gender", student.gender ?? "-"],
@@ -208,12 +218,7 @@ export const generateStudentPDFBuffer = (maybeStudent) => {
         }
       }
 
-      if (student.coursePreferences && student.coursePreferences.length > 0) {
-         const prefRows = student.coursePreferences
-           .sort((a,b) => (a.priority || 99) - (b.priority || 99))
-           .map(pref => [`Priority ${pref.priority ?? "-"}`, pref.courseName ?? "-"]);
-         drawSectionAsTable("Course Preferences", prefRows);
-      }
+      // Course preferences moved to Application Details section at the top
 
       // Add new page for parent/guardian details if current page is too full
       doc.addPage();

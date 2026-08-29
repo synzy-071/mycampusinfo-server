@@ -31,8 +31,7 @@ const TimelineEntrySchema = new mongoose.Schema({
     eligibility: {
         minQualification: {
             type: String,
-            trim: true,
-            enum : ['SSC Passed',"HSC Passed","Dipoma Passed","Under-Graduate","Post-Graduate","Bachelors","Masters","Phd"]
+            trim: true
         },
         otherInfo: {
             type: String,

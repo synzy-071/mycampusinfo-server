@@ -28,16 +28,6 @@ const ScholarshipSchema = new mongoose.Schema(
 
     documentsRequired: {
       type: [String],
-      enum: [
-        "Income Certificate",
-        "Caste Certificate",
-        "Aadhar Card",
-        "Previous Marksheet",
-        "Bonafide Certificate",
-        "Sports Achievement Certificate",
-        "Domicile Certificate",
-        "Other",
-      ],
     },
   },
   { timestamps: true }
