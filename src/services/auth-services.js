@@ -18,7 +18,20 @@ export const getAuth = async ({ authId }) => {
   return { auth };
 };
 
-export const registerUserService = async ({ email, password, userType, authProvider, deviceToken }) => {
+export const registerUserService = async ({ email, password, userType, authProvider, deviceToken, accountType }) => {
+  if (!accountType || !['college_user', 'college'].includes(accountType)) {
+      throw { status: 400, message: 'Invalid account type for college portal.' };
+  }
+  if (userType && !['college', 'student', 'parent'].includes(userType)) {
+      throw { status: 400, message: 'Invalid user type for college portal.' };
+  }
+  if (accountType === 'college' && userType !== 'college') {
+      throw { status: 400, message: 'Invalid user type for college account.' };
+  }
+  if (accountType === 'college_user' && !['student', 'parent'].includes(userType)) {
+      throw { status: 400, message: 'Invalid user type for college user account.' };
+  }
+
   const existingAuth = await Auth.findOne({ email });
 
   if (existingAuth) {
@@ -49,23 +62,37 @@ export const registerUserService = async ({ email, password, userType, authProvi
   return { email, token };
 };
 
-export const loginUserService = async ({ email, password, deviceToken }) => {
+export const loginUserService = async ({ email, password, deviceToken, accountType }) => {
+  if (!accountType || !['college_user', 'college'].includes(accountType)) {
+      throw { status: 400, message: 'Invalid account type for college portal.' };
+  }
+
   const auth = await Auth.findOne({ email });
 
   if (!auth) {
-    throw { status: 404, message: 'User not found' };
+    throw { status: 401, message: 'Invalid credentials or account type.' };
   }
 
   if (auth.password !== password) {
-    throw { status: 401, message: 'Incorrect password' };
+    throw { status: 401, message: 'Invalid credentials or account type.' };
   }
 
   if (!auth.isEmailVerified) {
     throw { status: 401, message: 'Please verify your email' };
   }
 
+  if (accountType === 'college') {
+      if (auth.userType !== 'college') {
+          throw { status: 401, message: 'Invalid credentials or account type.' };
+      }
+  } else if (accountType === 'college_user') {
+      if (auth.userType !== 'student' && auth.userType !== 'parent') {
+          throw { status: 401, message: 'Invalid credentials or account type.' };
+      }
+  }
+
   const token = jwt.sign(
-    { id: auth._id, email: auth.email },
+    { id: auth._id, email: auth.email, userType: auth.userType },
     process.env.SECRET,
     { expiresIn: '30d' }
   );

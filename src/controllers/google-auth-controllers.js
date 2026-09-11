@@ -2,9 +2,9 @@ import { handleGoogleAuthService } from '../services/google-auth-services.js';
 
 export const googleAuth = async (req, res) => {
   try {
-    const { tokenId, userType, isWeb } = req.body;
+    const { tokenId, userType, isWeb, accountType } = req.body;
 
-    const { auth, token } = await handleGoogleAuthService(tokenId, userType, isWeb || true);
+    const { auth, token } = await handleGoogleAuthService(tokenId, userType, isWeb || true, accountType);
 
     res.status(200).json({
       status: 'success',
