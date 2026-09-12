@@ -51,6 +51,7 @@ import {
     deleteCollegeByAuthId,
     getCollegesByStatus,
     getPendingColleges,
+    reverseGeocodeCollegeController,
 } from "../../controllers/college-controller.js";
 
 import {
@@ -190,6 +191,7 @@ router.get("/search", searchColleges);
 router.post('/predict-colleges', predictColleges);
 
 /* ===================== CORE ===================== */
+router.get("/reverse-geocode", reverseGeocodeCollegeController);
 router.post("/add", addCollege);
 router.get("/", getColleges);
 router.get("/pending", getPendingColleges);
