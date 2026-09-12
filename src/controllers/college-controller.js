@@ -155,3 +155,128 @@ export const deleteCollegePhoto = async (req, res) => {
     res.status(err.statusCode || 500).json({ success: false, message: err.message });
   }
 };
+
+/* REVERSE GEOCODE */
+export const reverseGeocodeCollegeController = async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ success: false, message: "Latitude and longitude are required" });
+    }
+
+    const latitude = Number(lat).toFixed(6);
+    const longitude = Number(lon).toFixed(6);
+
+    let city = "";
+    let state = "";
+    let country = "India";
+    let pincode = "";
+    let area = "";
+    let address = "";
+
+    // 1. Try Nominatim with timeout and custom User-Agent
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`;
+      const response = await fetch(nominatimUrl, {
+        headers: {
+          "User-Agent": "SynzyCollegeApp/1.0 (contact@synzy.com)",
+          "Accept-Language": "en",
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        const addr = data.address || {};
+        city = addr.city || addr.town || addr.village || addr.county || addr.state_district || "";
+        state = addr.state || "";
+        country = addr.country || "India";
+        pincode = addr.postcode || "";
+        area = addr.suburb || addr.neighbourhood || addr.locality || addr.district || "";
+        const street = [addr.house_number, addr.road || addr.pedestrian].filter(Boolean).join(" ");
+        address = [street, area, city, state, pincode].filter(Boolean).join(", ") || data.display_name || "";
+      }
+    } catch (nomErr) {
+      console.warn("Nominatim reverse geocode failed, trying fallbacks:", nomErr.message);
+    }
+
+    // 2. Fallback to Photon if pincode or city or address is missing
+    if (!pincode || !city || !address) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const photonRes = await fetch(
+          `https://photon.komoot.io/reverse?lat=${latitude}&lon=${longitude}`,
+          { signal: controller.signal }
+        );
+        clearTimeout(timeoutId);
+        if (photonRes.ok) {
+          const photonData = await photonRes.json();
+          const props = photonData?.features?.[0]?.properties;
+          if (props) {
+            if (!pincode && props.postcode) pincode = String(props.postcode);
+            if (!city) city = props.city || props.district || props.county || props.locality || "";
+            if (!state) state = props.state || "";
+            if (!country) country = props.country || "India";
+            if (!area) area = props.locality || props.district || props.county || "";
+            if (!address && (props.street || props.name)) {
+              address = [props.name, props.street, area, city, state, pincode].filter(Boolean).join(", ");
+            }
+          }
+        }
+      } catch (photonErr) {
+        console.warn("Photon fallback failed:", photonErr.message);
+      }
+    }
+
+    // 3. Fallback to BigDataCloud for administrative boundaries (city, state, country)
+    if (!city || !state || !pincode) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const bdcRes = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+          { signal: controller.signal }
+        );
+        clearTimeout(timeoutId);
+        if (bdcRes.ok) {
+          const bdcData = await bdcRes.json();
+          if (bdcData) {
+            if (!city) city = bdcData.city || bdcData.locality || "";
+            if (!state) state = bdcData.principalSubdivision || "";
+            if (!country) country = bdcData.countryName || "India";
+            if (!pincode && bdcData.postcode) pincode = String(bdcData.postcode);
+            if (!area && bdcData.locality) area = bdcData.locality;
+          }
+        }
+      } catch (bdcErr) {
+        console.warn("BigDataCloud fallback failed:", bdcErr.message);
+      }
+    }
+
+    // Ensure address is non-empty if we have area/city/state
+    if (!address) {
+      address = [area, city, state, pincode].filter(Boolean).join(", ");
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        latitude,
+        longitude,
+        address,
+        area,
+        city,
+        state,
+        country: country || "India",
+        pincode,
+      },
+    });
+  } catch (error) {
+    console.error("Reverse geocoding controller error:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
